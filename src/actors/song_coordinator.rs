@@ -6,7 +6,7 @@ use tokio::sync::{self, mpsc, oneshot};
 use tracing::{error, warn};
 use uuid::Uuid;
 
-use crate::routes::karaoke::SseEvent;
+use crate::routes::sse::SseEvent;
 
 fn serialize_uuid<S>(uuid: &Uuid, serializer: S) -> Result<S::Ok, S::Error>
 where

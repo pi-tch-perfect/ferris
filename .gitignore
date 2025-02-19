@@ -1,1 +1,5 @@
 target/
+embedded/*
+!embedded/.gitkeep
+assets/
+release/

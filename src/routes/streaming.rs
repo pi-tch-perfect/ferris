@@ -38,3 +38,4 @@ pub async fn serve_dash_file(Path((song_name, file)): Path<(String, String)>) ->
 
     Ok((StatusCode::OK, [("Content-Type", content_type)], contents).into_response())
 }
+

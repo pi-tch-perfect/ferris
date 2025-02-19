@@ -3,7 +3,7 @@ use std::{fs::File, io::BufReader, path::Path, sync::Arc};
 use tokio::sync::oneshot;
 use tracing::{debug, error, info, trace};
 
-use crate::lib::{
+use crate::utils::{
     dash_processor::{DashProcessor, ProcessingMode},
     yt_downloader::{VideoProcessError, YtDownloader},
 };
@@ -36,6 +36,7 @@ impl VideoDlActor {
         base_dir: String,
         video_downloader: Arc<YtDownloader>,
         consumer_id: u8,
+
     ) -> Self {
         trace!("Initializing VideoDlActor consumer {}", consumer_id);
         VideoDlActor {

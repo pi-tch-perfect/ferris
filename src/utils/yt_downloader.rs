@@ -1,5 +1,8 @@
 use std::process::Command;
 use thiserror::Error;
+use tracing::debug;
+
+use crate::globals;
 
 #[derive(Error, Debug)]
 pub enum VideoProcessError {
@@ -35,6 +38,8 @@ impl YtDownloader {
         base_dir: &str,
         file_name: &str,
     ) -> Result<VideoMetadata, VideoProcessError> {
+        let ffmpeg_path = globals::get_binary_path("ffmpeg");
+
         let args = vec![
             "-f".to_string(),
             "bestvideo[height<=720][vcodec^=avc1]+bestaudio".to_string(),
@@ -46,11 +51,18 @@ impl YtDownloader {
             "--print".to_string(),
             "filename,duration".to_string(),  // Print both filename and duration
             "--no-simulate".to_string(),
+            "--ffmpeg-location".to_string(),
+            ffmpeg_path.to_string_lossy().to_string(),
             "--".to_string(),
             format!("{}", yt_link.to_string()),
         ];
 
-        let output = Command::new("yt-dlp")
+        debug!("yt-dlp command: {:?}", args);
+
+        let ytdlp_path = globals::get_binary_path("yt-dlp");
+        debug!("Using yt-dlp from path: {}", ytdlp_path.display());
+
+        let output = Command::new(ytdlp_path)
             .args(&args)
             .output()
             .map_err(VideoProcessError::CommandError)?;
@@ -60,7 +72,10 @@ impl YtDownloader {
             return Err(VideoProcessError::DownloadError(stderr.to_string()));
         }
 
-        self.parse_output(&output.stdout)
+        let parsed = self.parse_output(&output.stdout);
+        debug!("parseed {:?}", parsed);
+
+        parsed
     }
 
     fn parse_output(&self, output: &[u8]) -> Result<VideoMetadata, VideoProcessError> {

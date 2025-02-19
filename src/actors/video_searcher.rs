@@ -3,7 +3,7 @@ use std::sync::Arc;
 use tokio::sync::oneshot;
 use tracing::{error, info, trace};
 
-use crate::lib::yt_searcher::{SearchError, SearchResult, YtSearcher};
+use crate::utils::yt_searcher::{SearchError, SearchResult, YtSearcher};
 
 pub enum VideoSearcherActorMessage {
     SearchVideo {

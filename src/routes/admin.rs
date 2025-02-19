@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::actors::song_coordinator::SongActorHandle;
 
-use super::karaoke::SseEvent;
+use super::sse::SseEvent;
 
 pub async fn toggle_playback(
     State(sse_broadcaster): State<Arc<sync::broadcast::Sender<SseEvent>>>,

@@ -6,12 +6,13 @@ use tokio::sync;
 
 use crate::actors::video_downloader::VideoDlActorHandle;
 use crate::actors::video_searcher::VideoSearcherActorHandle;
-use crate::lib::yt_downloader::YtDownloader;
-use crate::lib::yt_searcher::YtSearcher;
 use crate::routes::admin::{get_key, remove_song, reposition_song, restart_song};
-use crate::routes::karaoke::{current_song, play_next_song, queue_song, search, song_list, sse};
+use crate::routes::karaoke::{current_song, play_next_song, queue_song, search, song_list};
+use crate::routes::sse::sse;
 use crate::routes::streaming::serve_dash_file;
 use crate::routes::sys::server_ip;
+use crate::utils::yt_downloader::YtDownloader;
+use crate::utils::yt_searcher::YtSearcher;
 use crate::{
     actors::song_coordinator::SongActorHandle,
     routes::admin::{key_down, key_up, toggle_playback},

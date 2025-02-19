@@ -3,7 +3,7 @@ use std::sync::Arc;
 use axum::extract::FromRef;
 use tokio::sync;
 
-use crate::{actors::{song_coordinator::SongActorHandle, video_downloader::VideoDlActorHandle, video_searcher::VideoSearcherActorHandle}, routes::karaoke::SseEvent};
+use crate::{actors::{song_coordinator::SongActorHandle, video_downloader::VideoDlActorHandle, video_searcher::VideoSearcherActorHandle}, routes::sse::SseEvent};
 
 #[derive(Clone)]
 pub struct AppState {

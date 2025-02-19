@@ -3,6 +3,8 @@ use thiserror::Error;
 use tracing::{debug, info};
 use unidecode::unidecode;
 
+use crate::globals;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SearchResult {
     pub title: String,
@@ -40,7 +42,11 @@ impl YtSearcher {
         
         debug!("yt-dlp search command: {:?}", args.join(" "));
 
-        let output = std::process::Command::new("yt-dlp")
+
+        let ytdlp_path = globals::get_binary_path("yt-dlp");
+        debug!("Using yt-dlp from path: {}", ytdlp_path.display());
+
+        let output = std::process::Command::new(ytdlp_path)
             .args(&args)
             .output()?;
 

@@ -1,6 +1,8 @@
 use std::process::Command;
 use tracing::{debug, error};
 
+use crate::globals;
+
 #[derive(Debug)]
 pub enum ProcessingMode {
     Copy,
@@ -8,23 +10,23 @@ pub enum ProcessingMode {
 }
 
 pub struct DashProcessor {
-    segment_duration: u32
+    segment_duration: u32,
 }
 
 impl DashProcessor {
     pub fn new(segment_duration: u32) -> Self {
-        DashProcessor {
-            segment_duration
-        }
+        DashProcessor { segment_duration }
     }
 
     fn build_filter_complex(&self, mode: &ProcessingMode) -> Option<String> {
         match mode {
-            ProcessingMode::Copy => Some("[0:a]loudnorm=I=-16:TP=-1.5:LRA=11[normalized]".to_string()),
+            ProcessingMode::Copy => {
+                Some("[0:a]loudnorm=I=-16:TP=-1.5:LRA=11[normalized]".to_string())
+            }
             ProcessingMode::PitchShift(shifts) => {
                 let num_streams = shifts.len();
                 let mut filter = format!("[0:a]asplit={}", num_streams);
-                
+
                 // Create split points
                 for i in 0..num_streams {
                     filter.push_str(&format!("[a{}]", i));
@@ -61,7 +63,7 @@ impl DashProcessor {
 
     fn build_stream_mappings(&self, mode: &ProcessingMode) -> Vec<String> {
         let mut mappings = vec!["-map".to_string(), "0:v".to_string()];
-        
+
         match mode {
             ProcessingMode::Copy => {
                 mappings.extend(vec!["-map".to_string(), "[normalized]".to_string()]);
@@ -73,13 +75,13 @@ impl DashProcessor {
                 }
             }
         }
-        
+
         mappings
     }
 
     fn build_audio_encodings(&self, mode: &ProcessingMode) -> Vec<String> {
         let mut encodings = Vec::new();
-        
+
         match mode {
             ProcessingMode::Copy => {
                 encodings.extend(vec![
@@ -98,23 +100,25 @@ impl DashProcessor {
                 }
             }
         }
-        
+
         encodings
     }
 
-    pub fn execute(&self, input_file: &str, output_file: &str, mode: &ProcessingMode) -> std::io::Result<()> {
-        let mut command = Command::new("ffmpeg");
-        command
-            .arg("-i")
-            .arg(input_file)
-            .arg("-c:v")
-            .arg("copy");
+    pub fn execute(
+        &self,
+        input_file: &str,
+        output_file: &str,
+        mode: &ProcessingMode,
+    ) -> std::io::Result<()> {
+        let ffmpeg_path = globals::get_binary_path("ffmpeg");
+        debug!("Using FFmpeg from path: {}", ffmpeg_path.display());
+
+        let mut command = Command::new(ffmpeg_path);
+        command.arg("-i").arg(input_file).arg("-c:v").arg("copy");
 
         // Add filter complex if needed
         if let Some(filter_complex) = self.build_filter_complex(mode) {
-            command
-                .arg("-filter_complex")
-                .arg(filter_complex);
+            command.arg("-filter_complex").arg(filter_complex);
         }
 
         command
