@@ -3,3 +3,5 @@ embedded/*
 !embedded/.gitkeep
 assets/
 release/
+static/*
+!static/.gitkeep
